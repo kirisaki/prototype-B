@@ -4,11 +4,6 @@ import Control.Applicative
 
 newtype Tokenizer i a = Tokenizer { runTokenizer :: [i] -> Either String (a, [i]) }
 
-item :: Tokenizer Char Char
-item = Tokenizer $ \case
-  [] -> Left "empty"
-  (x:xs) -> Right (x, xs)
-
 instance Functor (Tokenizer i) where
   fmap f p = Tokenizer $ \i -> case runTokenizer p i of
     Right (x, o) -> Right $ (f x, o)
