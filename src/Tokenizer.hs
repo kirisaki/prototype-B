@@ -1,6 +1,8 @@
+{-# LANGUAGe FunctionalDependencies #-}
 module Tokenizer where
 
 import Control.Applicative
+import Control.Monad
 
 type SourcePos = Int
 
@@ -13,6 +15,9 @@ data TokenizerState i = TokenizerState
   { tokSource :: [i]
   , tokPos :: SourcePos
   }
+
+class (Monad m) => TokenizerStream i m o | i -> o where
+   uncons :: i -> m (Maybe (o,i))
 
 newtype Tokenizer i a = Tokenizer
   { runTokenizer :: TokenizerState i -> [i] -> Either TokenizeError (a, [i]) }
@@ -42,5 +47,4 @@ instance Monad (Tokenizer i) where
 primToken :: (SourcePos -> o -> i -> SourcePos)
           -> (o -> Maybe o')
           -> Tokenizer i o'
-primToken = \nextPos match ->
-              Tokenizer undefined
+primToken = \nextPos match -> undefined
