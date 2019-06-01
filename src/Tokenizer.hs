@@ -1,8 +1,11 @@
 {-# LANGUAGe FunctionalDependencies #-}
+{-# LANGUAGe FlexibleInstances #-}
+{-# LANGUAGe FlexibleContexts #-}
 module Tokenizer where
 
 import Control.Applicative
 import Control.Monad
+import Data.Functor.Identity
 
 type SourcePos = Int
 
@@ -16,8 +19,12 @@ data TokenizerState i = TokenizerState
   , tokPos :: SourcePos
   }
 
-class (Monad m) => TokenizerStream i m o | i -> o where
-   uncons :: i -> m (Maybe (o,i))
+class TokenizerStream i o | i -> o where
+   uncons :: i -> Either TokenizeError (Maybe (o, i))
+
+instance TokenizerStream [i] i where
+    uncons []     = pure Nothing
+    uncons (t:ts) = pure $ Just (t,ts)
 
 newtype Tokenizer i a = Tokenizer
   { runTokenizer :: TokenizerState i -> [i] -> Either TokenizeError (a, [i]) }
@@ -44,7 +51,8 @@ instance Monad (Tokenizer i) where
     Right (x, o) -> runTokenizer (f x) s o
     Left e -> Left e
 
-primToken :: (SourcePos -> o -> i -> SourcePos)
+primToken :: (TokenizerStream i o)
+          => (SourcePos -> o -> i -> SourcePos)
           -> (o -> Maybe o')
           -> Tokenizer i o'
 primToken = \nextPos match -> undefined
