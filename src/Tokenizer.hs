@@ -2,14 +2,16 @@ module Tokenizer where
 
 import Control.Applicative
 
+type SourcePos = Int
+
 data TokenizeError = TokenizeError
   { message :: String
-  , position :: Int
+  , position :: SourcePos
   }
 
 data TokenizerState i = TokenizerState
   { tokSource :: [i]
-  , tokPos :: Int
+  , tokPos :: SourcePos
   }
 
 newtype Tokenizer i a = Tokenizer
@@ -37,3 +39,8 @@ instance Monad (Tokenizer i) where
     Right (x, o) -> runTokenizer (f x) s o
     Left e -> Left e
 
+primToken :: (SourcePos -> o -> i -> SourcePos)
+          -> (o -> Maybe o')
+          -> Tokenizer i o'
+primToken = \nextPos match ->
+              Tokenizer undefined
