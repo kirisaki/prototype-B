@@ -2,7 +2,12 @@ module Tokenizer where
 
 import Control.Applicative
 
-newtype Tokenizer i a = Tokenizer { runTokenizer :: [i] -> Either String (a, [i]) }
+data TokenizeError = TokenizeError
+  { message :: String
+  , position :: Int
+  }
+  
+newtype Tokenizer i a = Tokenizer { runTokenizer :: [i] -> Either TokenizeError (a, [i]) }
 
 instance Functor (Tokenizer i) where
   fmap f p = Tokenizer $ \i -> case runTokenizer p i of
@@ -16,7 +21,7 @@ instance Applicative (Tokenizer i) where
     Left e -> Left e
 
 instance Alternative (Tokenizer i) where
-  empty = Tokenizer . const $ Left "fail"
+  empty = Tokenizer . const . Left $ TokenizeError "empty" 0
   p <|> q = Tokenizer $ \i -> case runTokenizer p i of
     Right x -> Right x
     Left _ -> runTokenizer q i
