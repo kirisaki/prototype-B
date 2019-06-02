@@ -1,15 +1,17 @@
 {-# LANGUAGe FunctionalDependencies #-}
 {-# LANGUAGe FlexibleInstances #-}
 {-# LANGUAGe FlexibleContexts #-}
+{-# LANGUAGE RecordWildCards #-}
 module Tokenizer where
 
 import Control.Applicative
 import Control.Monad
+import Control.Monad.Fail
 import Data.Functor.Identity
 
 type SourcePos = Int
 
-data TokenizeError = TokenizeError
+data TokenizerError = TokenizerError
   { message :: String
   , position :: SourcePos
   }
@@ -19,15 +21,9 @@ data TokenizerState i = TokenizerState
   , tokPos :: SourcePos
   }
 
-class TokenizerStream i o | i -> o where
-   uncons :: i -> Either TokenizeError (Maybe (o, i))
-
-instance TokenizerStream [i] i where
-    uncons []     = pure Nothing
-    uncons (t:ts) = pure $ Just (t,ts)
 
 newtype Tokenizer i a = Tokenizer
-  { runTokenizer :: TokenizerState i -> [i] -> Either TokenizeError (a, [i]) }
+  { runTokenizer :: TokenizerState i -> [i] -> Either TokenizerError (a, [i]) }
 
 instance Functor (Tokenizer i) where
   fmap f p = Tokenizer $ \s i -> case runTokenizer p s i of
@@ -41,7 +37,7 @@ instance Applicative (Tokenizer i) where
     Left e -> Left e
 
 instance Alternative (Tokenizer i) where
-  empty = Tokenizer $ \s i ->  Left $ TokenizeError "empty" 0
+  empty = Tokenizer $ \s i ->  Left $ TokenizerError "empty" 0
   p <|> q = Tokenizer $ \s i -> case runTokenizer p s i of
     Right x -> Right x
     Left _ -> runTokenizer q s i
@@ -51,8 +47,21 @@ instance Monad (Tokenizer i) where
     Right (x, o) -> runTokenizer (f x) s o
     Left e -> Left e
 
-primToken :: (TokenizerStream i o)
-          => (SourcePos -> o -> i -> SourcePos)
-          -> (o -> Maybe o')
-          -> Tokenizer i o'
-primToken = \nextPos match -> undefined
+primToken :: (SourcePos -> i -> [i] -> SourcePos)
+          -> (i -> Maybe o)
+          -> Tokenizer i o
+primToken = \nextpos match -> Tokenizer $ \TokenizerState{..} i ->
+  case i of
+    [] -> Left $ TokenizerError "empty input" tokPos
+    c:cs -> case match c of
+      Just x ->
+        let
+          newpos = nextpos tokPos c cs
+          newst = TokenizerState cs newpos
+        in
+          Right (x, cs)
+
+satisfy :: (i -> Bool) -> Tokenizer i i
+satisfy f = primToken
+            (\pos c _ -> pos + 1)
+            (\c -> if f c then Just c else Nothing)
