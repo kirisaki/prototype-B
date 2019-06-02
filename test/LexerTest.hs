@@ -12,3 +12,6 @@ unit_digit = runTokenizer digit (TokenizerState [] 0) "1234" @?= Right (LxNum 12
 
 unit_skip_space :: IO ()
 unit_skip_space = runTokenizer (skipSpace *> digit) (TokenizerState [] 0) "    1234" @?= Right (LxNum 1234 , "")
+
+unit_varId :: IO ()
+unit_varId = runTokenizer varId (TokenizerState [] 0) "ab12cd" @?= Right (LxVarId "ab12cd" , "")

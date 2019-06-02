@@ -24,3 +24,9 @@ space = satisfy isSpace
 
 skipSpace :: Tokenizer Char ()
 skipSpace = many space *> pure ()
+
+letter :: Tokenizer Char Char
+letter = satisfy isAlpha
+
+varId :: Lexer
+varId = LxVarId <$> ((:) <$> letter <*> many (letter <|> number))

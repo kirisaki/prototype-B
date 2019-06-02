@@ -94,3 +94,5 @@ satisfy f = primToken
 item :: Eq i => i -> Tokenizer i i
 item i = satisfy (== i)
 
+oneOf :: Eq i => [i] -> Tokenizer i i
+oneOf is = satisfy (`elem` is)
