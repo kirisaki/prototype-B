@@ -30,3 +30,9 @@ letter = satisfy isAlpha
 
 varId :: Lexer
 varId = LxVarId <$> ((:) <$> letter <*> many (letter <|> number))
+
+varSym :: Lexer
+varSym = LxVarSym . (: []) <$> oneOf "+-*/"
+
+expr :: Tokenizer Char [Lexeme]
+expr = some (skipSpace *> (digit <|> varId <|> varSym))

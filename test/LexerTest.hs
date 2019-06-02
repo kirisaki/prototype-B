@@ -15,3 +15,11 @@ unit_skip_space = runTokenizer (skipSpace *> digit) (TokenizerState [] 0) "    1
 
 unit_varId :: IO ()
 unit_varId = runTokenizer varId (TokenizerState [] 0) "ab12cd" @?= Right (LxVarId "ab12cd" , "")
+
+unit_expr :: IO ()
+unit_expr =
+  runTokenizer
+  expr
+  (TokenizerState [] 0)
+  "1 + b" @?=
+  Right ([LxNum 1, LxVarSym "+", LxVarId "b"] , "")
