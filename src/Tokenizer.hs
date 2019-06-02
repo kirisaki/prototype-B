@@ -14,7 +14,7 @@ type SourcePos = Int
 data TokenizerError = TokenizerError
   { message :: String
   , position :: SourcePos
-  }
+  } deriving (Show, Eq)
 
 data TokenizerState i = TokenizerState
   { tokSource :: [i]
