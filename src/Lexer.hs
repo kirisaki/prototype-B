@@ -16,5 +16,11 @@ type Lexer = Tokenizer Char Lexeme
 number :: Tokenizer Char Char
 number = satisfy isNumber
 
-digit :: Tokenizer Char Lexeme
+digit :: Lexer
 digit = LxNum . read <$> some number
+
+space :: Tokenizer Char Char
+space = satisfy isSpace
+
+skipSpace :: Tokenizer Char ()
+skipSpace = many space *> pure ()

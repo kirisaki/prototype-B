@@ -93,3 +93,4 @@ satisfy f = primToken
 
 item :: Eq i => i -> Tokenizer i i
 item i = satisfy (== i)
+
