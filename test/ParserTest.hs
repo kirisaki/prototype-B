@@ -1,7 +1,7 @@
 module ParserTest where
 
+import Lexer (lexemes)
 import Tokenizer
-import Lexer
 import Parser
 import AST
 
@@ -10,7 +10,8 @@ import Test.Tasty.HUnit
 
 
 unit_varid :: IO ()
-unit_varid =
-  runTokenizer term (TokenizerState [] 0) "abc"
-  @?= Right (Var "abc" , "")
+unit_varid = do
+  let Right (lxs, _) = runTokenizer lexemes (TokenizerState [] 0) "abc"
+  runTokenizer varId (TokenizerState [] 0) lxs
+    @?= Right (Var "abc" , [])
 

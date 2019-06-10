@@ -6,7 +6,8 @@ import AST
 
 import Control.Applicative
 
-type Parser = Tokenizer Char Expr
+type Parser = Tokenizer Lexeme Expr
 
-term :: Parser
-term = Var . unLxVarId <$> varId
+varId :: Parser
+varId = Var . unLxVarId <$> satisfy isVarId
+

@@ -36,3 +36,18 @@ varSym = LxVarSym . (: []) <$> oneOf "+-*/"
 
 lexemes :: Tokenizer Char [Lexeme]
 lexemes = some (skipSpace *> (digit <|> varId <|> varSym))
+
+isNum :: Lexeme -> Bool
+isNum = \case
+  LxNum {} -> True
+  _ -> False
+
+isVarId :: Lexeme -> Bool
+isVarId = \case
+  LxVarId {} -> True
+  _ -> False
+
+isVarSym :: Lexeme -> Bool
+isVarSym = \case
+  LxVarSym {} -> True
+  _ -> False
