@@ -32,7 +32,7 @@ varId :: Lexer
 varId = LxVarId <$> ((:) <$> letter <*> many (letter <|> number))
 
 varSym :: Lexer
-varSym = LxVarSym . (: []) <$> oneOf "+-*/"
+varSym = LxVarSym . (: []) <$> oneOf "/*-+"
 
 lexemes :: Tokenizer Char [Lexeme]
 lexemes = some (skipSpace *> (digit <|> varId <|> varSym))
