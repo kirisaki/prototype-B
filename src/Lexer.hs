@@ -6,9 +6,9 @@ import Control.Applicative
 import Data.Char
 
 data Lexeme
-  = LxNum Int
-  | LxVarId String
-  | LxVarSym String
+  = LxNum { unLxNum :: Int }
+  | LxVarId { unLxVarId :: String }
+  | LxVarSym{ unLxVarSym :: String }
   deriving (Show, Eq)
 
 type Lexer = Tokenizer Char Lexeme
@@ -34,5 +34,5 @@ varId = LxVarId <$> ((:) <$> letter <*> many (letter <|> number))
 varSym :: Lexer
 varSym = LxVarSym . (: []) <$> oneOf "+-*/"
 
-expr :: Tokenizer Char [Lexeme]
-expr = some (skipSpace *> (digit <|> varId <|> varSym))
+lexemes :: Tokenizer Char [Lexeme]
+lexemes = some (skipSpace *> (digit <|> varId <|> varSym))

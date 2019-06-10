@@ -19,7 +19,7 @@ unit_varId = runTokenizer varId (TokenizerState [] 0) "ab12cd" @?= Right (LxVarI
 unit_expr :: IO ()
 unit_expr =
   runTokenizer
-  expr
+  lexemes
   (TokenizerState [] 0)
   "1 + b" @?=
   Right ([LxNum 1, LxVarSym "+", LxVarId "b"] , "")

@@ -1,6 +1,12 @@
 module AST where
 
-data Exp
-  = Apply Exp Exp
-  | Lambda String Exp
+data Expr
+  = Apply Expr Expr
+  | Lambda String Expr
   | Var String
+  | Lit Lit
+  deriving (Eq, Show)
+
+data Lit
+  = Int Int
+  deriving (Eq, Show)
